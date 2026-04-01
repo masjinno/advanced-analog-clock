@@ -1,0 +1,32 @@
+# Build outputs
+**/bin/
+**/obj/
+
+# Test outputs
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+
+# NuGet package outputs
+*.nupkg
+*.snupkg
+
+# Visual Studio / .NET user files
+.vs/
+*.user
+*.rsuser
+*.suo
+*.userosscache
+*.sln.docstates
+
+# VS Code / JetBrains workspace metadata
+.vscode/
+.idea/
+
+# OS/editor temp files
+*.tmp
+*.temp
+*.swp
+*.DS_Store
+Thumbs.db
