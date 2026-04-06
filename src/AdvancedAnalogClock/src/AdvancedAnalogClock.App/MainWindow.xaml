@@ -29,27 +29,25 @@
         <SolidColorBrush x:Key="SecondHandBrush" Color="#FB7185" />
         <SolidColorBrush x:Key="CenterDotFillBrush" Color="#E2E8F0" />
         <SolidColorBrush x:Key="CenterDotStrokeBrush" Color="#0F172A" />
-
-        <SolidColorBrush x:Key="MenuBackgroundBrush" Color="#111827" />
-        <SolidColorBrush x:Key="MenuForegroundBrush" Color="#F8FAFC" />
     </Window.Resources>
 
-    <Grid Margin="10" MouseLeftButtonDown="OnWindowDragMove">
+        <Grid Margin="10"
+            MouseLeftButtonDown="OnWindowDragMove">
         <Grid.ContextMenu>
-            <ContextMenu Background="{DynamicResource MenuBackgroundBrush}"
-                         Foreground="{DynamicResource MenuForegroundBrush}">
-                <MenuItem Header="Theme">
-                    <MenuItem x:Name="DarkModeMenuItem"
-                              Header="Dark"
-                              IsCheckable="True"
-                              Click="OnDarkModeMenuClick" />
+            <ContextMenu x:Name="ClockContextMenu">
+
+                <MenuItem x:Name="ThemeMenuItem" Header="テーマ">
                     <MenuItem x:Name="LightModeMenuItem"
-                              Header="Light"
+                              Header="ライト"
                               IsCheckable="True"
                               Click="OnLightModeMenuClick" />
+                    <MenuItem x:Name="DarkModeMenuItem"
+                              Header="ダーク"
+                              IsCheckable="True"
+                              Click="OnDarkModeMenuClick" />
                 </MenuItem>
                 <Separator />
-                <MenuItem Header="Exit" Click="OnExitMenuClick" />
+                <MenuItem Header="終了" Click="OnExitMenuClick" />
             </ContextMenu>
         </Grid.ContextMenu>
 

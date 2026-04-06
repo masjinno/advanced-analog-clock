@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using System.Collections.Generic;
 using System.Windows.Input;
 using System.Windows.Media;
 using AdvancedAnalogClock.App.ViewModels;
@@ -17,14 +18,14 @@ public partial class MainWindow : Window
     }
 
     private readonly MainWindowViewModel _viewModel;
-    private ClockTheme _currentTheme = ClockTheme.Dark;
+    private ClockTheme _currentTheme = ClockTheme.Light;
 
     public MainWindow()
     {
         InitializeComponent();
         _viewModel = new MainWindowViewModel();
         DataContext = _viewModel;
-        ApplyTheme(ClockTheme.Dark);
+        ApplyTheme(ClockTheme.Light);
     }
 
     protected override void OnClosed(EventArgs e)
@@ -79,8 +80,6 @@ public partial class MainWindow : Window
             SetBrush("SecondHandBrush", "#FB7185");
             SetBrush("CenterDotFillBrush", "#E2E8F0");
             SetBrush("CenterDotStrokeBrush", "#0F172A");
-            SetBrush("MenuBackgroundBrush", "#111827");
-            SetBrush("MenuForegroundBrush", "#F8FAFC");
         }
         else
         {
@@ -95,8 +94,6 @@ public partial class MainWindow : Window
             SetBrush("SecondHandBrush", "#DC2626");
             SetBrush("CenterDotFillBrush", "#0F172A");
             SetBrush("CenterDotStrokeBrush", "#E2E8F0");
-            SetBrush("MenuBackgroundBrush", "#FFFFFF");
-            SetBrush("MenuForegroundBrush", "#0F172A");
         }
 
         DarkModeMenuItem.IsChecked = _currentTheme == ClockTheme.Dark;
