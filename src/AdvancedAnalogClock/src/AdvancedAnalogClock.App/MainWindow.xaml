@@ -14,6 +14,7 @@
         WindowStyle="None"
         ResizeMode="CanResizeWithGrip"
         AllowsTransparency="True"
+        Loaded="OnWindowLoaded"
         Background="Transparent">
     <Window.Resources>
         <SolidColorBrush x:Key="ClockFaceFillBrush" Color="#0B1220" />
@@ -46,6 +47,12 @@
                               IsCheckable="True"
                               Click="OnDarkModeMenuClick" />
                 </MenuItem>
+                <MenuItem x:Name="CalendarMenuItem"
+                          Header="予定"
+                          StaysOpenOnClick="True"
+                          Click="OnCalendarMenuClick">
+                    <MenuItem Header="クリックして読み込み" IsEnabled="False" />
+                </MenuItem>
                 <Separator />
                 <MenuItem Header="終了" Click="OnExitMenuClick" />
             </ContextMenu>
@@ -64,6 +71,25 @@
                 <Ellipse Margin="8"
                          Stroke="{DynamicResource ClockInnerStrokeBrush}"
                          StrokeThickness="2" />
+
+                <ItemsControl ItemsSource="{Binding ScheduleRanges}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <Canvas Width="300" Height="300" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Path Data="{Binding Geometry}"
+                                  Fill="{Binding Fill}"
+                                  Stroke="{Binding Stroke}"
+                                  StrokeThickness="0.8"
+                                  ToolTip="{Binding ToolTip}"
+                                  Cursor="Hand"
+                                  MouseLeftButtonUp="OnScheduleRangeClick" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
 
                 <ItemsControl ItemsSource="{Binding TickMarks}">
                     <ItemsControl.ItemsPanel>
@@ -162,6 +188,24 @@
                         <RotateTransform Angle="{Binding SecondAngle}" CenterX="150" CenterY="150" />
                     </Line.RenderTransform>
                 </Line>
+
+                <ItemsControl ItemsSource="{Binding ScheduleRanges}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <Canvas Width="300" Height="300" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Path Data="{Binding Geometry}"
+                                  Fill="Transparent"
+                                  StrokeThickness="0"
+                                  Cursor="Hand"
+                                  ToolTip="{Binding ToolTip}"
+                                  MouseLeftButtonDown="OnScheduleRangeClick" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
 
                 <Ellipse Width="12"
                          Height="12"
