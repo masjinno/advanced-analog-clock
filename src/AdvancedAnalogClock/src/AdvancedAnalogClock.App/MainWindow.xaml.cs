@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
 using System.Collections.Generic;
 using System.Windows.Input;
 using System.Windows.Controls;
+using System.Windows.Interop;
 using System.Windows.Media;
 using AdvancedAnalogClock.App.Models;
 using AdvancedAnalogClock.App.Services;
@@ -17,6 +19,16 @@ namespace AdvancedAnalogClock.App;
 /// </summary>
 public partial class MainWindow : Window
 {
+    private const int WmSizing = 0x0214;
+    private const int WmszLeft = 1;
+    private const int WmszRight = 2;
+    private const int WmszTop = 3;
+    private const int WmszTopLeft = 4;
+    private const int WmszTopRight = 5;
+    private const int WmszBottom = 6;
+    private const int WmszBottomLeft = 7;
+    private const int WmszBottomRight = 8;
+
     private enum ClockTheme
     {
         Dark,
@@ -31,6 +43,7 @@ public partial class MainWindow : Window
     private bool _calendarLoaded;
     private bool _calendarLoading;
     private string? _calendarLoadError;
+    private HwndSource? _hwndSource;
     private ClockTheme _currentTheme = ClockTheme.Light;
 
     public MainWindow()
@@ -42,17 +55,172 @@ public partial class MainWindow : Window
         ApplyTheme(ClockTheme.Light);
     }
 
+    protected override void OnSourceInitialized(EventArgs e)
+    {
+        base.OnSourceInitialized(e);
+
+        _hwndSource = (HwndSource?)PresentationSource.FromVisual(this);
+        _hwndSource?.AddHook(WindowProc);
+    }
+
     protected override void OnClosed(EventArgs e)
     {
+        if (_hwndSource is not null)
+        {
+            _hwndSource.RemoveHook(WindowProc);
+        }
+
         _calendarRequestCts?.Cancel();
         _calendarRequestCts?.Dispose();
         _viewModel.Dispose();
         base.OnClosed(e);
     }
 
-    private async void OnWindowLoaded(object sender, RoutedEventArgs e)
+    private void OnWindowDragMove(object sender, MouseButtonEventArgs e)
     {
-        if (_calendarLoaded || _calendarLoading)
+        if (e.OriginalSource is FrameworkElement sourceElement &&
+            sourceElement.DataContext is ClockScheduleRangeMark)
+        {
+            return;
+        }
+
+        if (e.LeftButton == MouseButtonState.Pressed)
+        {
+            DragMove();
+        }
+    }
+
+    private IntPtr WindowProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+    {
+        if (msg != WmSizing)
+        {
+            return IntPtr.Zero;
+        }
+
+        if (lParam == IntPtr.Zero)
+        {
+            return IntPtr.Zero;
+        }
+
+        var edge = wParam.ToInt32();
+        var rect = Marshal.PtrToStructure<RectStruct>(lParam);
+        var width = rect.Right - rect.Left;
+        var height = rect.Bottom - rect.Top;
+        var minSize = (int)Math.Ceiling(Math.Max(MinWidth, MinHeight));
+
+        var targetSize = edge switch
+        {
+            WmszLeft or WmszRight => Math.Max(width, minSize),
+            WmszTop or WmszBottom => Math.Max(height, minSize),
+            _ => Math.Max(Math.Max(width, height), minSize),
+        };
+
+        switch (edge)
+        {
+            case WmszLeft:
+                rect.Left = rect.Right - targetSize;
+                rect.Bottom = rect.Top + targetSize;
+                break;
+            case WmszRight:
+                rect.Right = rect.Left + targetSize;
+                rect.Bottom = rect.Top + targetSize;
+                break;
+            case WmszTop:
+                rect.Top = rect.Bottom - targetSize;
+                rect.Right = rect.Left + targetSize;
+                break;
+            case WmszBottom:
+                rect.Bottom = rect.Top + targetSize;
+                rect.Right = rect.Left + targetSize;
+                break;
+            case WmszTopLeft:
+                rect.Left = rect.Right - targetSize;
+                rect.Top = rect.Bottom - targetSize;
+                break;
+            case WmszTopRight:
+                rect.Right = rect.Left + targetSize;
+                rect.Top = rect.Bottom - targetSize;
+                break;
+            case WmszBottomLeft:
+                rect.Left = rect.Right - targetSize;
+                rect.Bottom = rect.Top + targetSize;
+                break;
+            case WmszBottomRight:
+                rect.Right = rect.Left + targetSize;
+                rect.Bottom = rect.Top + targetSize;
+                break;
+        }
+
+        Marshal.StructureToPtr(rect, lParam, fDeleteOld: true);
+        handled = true;
+        return IntPtr.Zero;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct RectStruct
+    {
+        public int Left;
+        public int Top;
+        public int Right;
+        public int Bottom;
+    }
+
+    private void OnExitMenuClick(object sender, RoutedEventArgs e)
+    {
+        RequestApplicationExit();
+    }
+
+    private void OnDarkModeMenuClick(object sender, RoutedEventArgs e)
+    {
+        ApplyTheme(ClockTheme.Dark);
+    }
+
+    private void OnLightModeMenuClick(object sender, RoutedEventArgs e)
+    {
+        ApplyTheme(ClockTheme.Light);
+    }
+
+    private async void OnRefreshCalendarMenuClick(object sender, RoutedEventArgs e)
+    {
+        await FetchCalendarAsync();
+    }
+
+    private void OnCalendarMenuClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is not MenuItem calendarMenu)
+        {
+            return;
+        }
+
+        if (_calendarLoading)
+        {
+            RenderCalendarLoading(calendarMenu);
+        }
+        else if (!_calendarLoaded)
+        {
+            calendarMenu.Items.Clear();
+            calendarMenu.Items.Add(new MenuItem
+            {
+                Header = "予定を初期化中です",
+                IsEnabled = false,
+            });
+        }
+        else if (!string.IsNullOrWhiteSpace(_calendarLoadError))
+        {
+            RenderCalendarError(calendarMenu, _calendarLoadError);
+        }
+        else
+        {
+            RenderCalendarEvents(calendarMenu, _calendarEvents);
+        }
+
+        calendarMenu.IsSubmenuOpen = true;
+        e.Handled = true;
+    }
+
+    private async Task FetchCalendarAsync()
+    {
+        if (_calendarLoading)
         {
             return;
         }
@@ -98,68 +266,6 @@ public partial class MainWindow : Window
             _calendarRequestCts?.Dispose();
             _calendarRequestCts = null;
         }
-    }
-
-    private void OnWindowDragMove(object sender, MouseButtonEventArgs e)
-    {
-        if (e.OriginalSource is FrameworkElement sourceElement &&
-            sourceElement.DataContext is ClockScheduleRangeMark)
-        {
-            return;
-        }
-
-        if (e.LeftButton == MouseButtonState.Pressed)
-        {
-            DragMove();
-        }
-    }
-
-    private void OnExitMenuClick(object sender, RoutedEventArgs e)
-    {
-        RequestApplicationExit();
-    }
-
-    private void OnDarkModeMenuClick(object sender, RoutedEventArgs e)
-    {
-        ApplyTheme(ClockTheme.Dark);
-    }
-
-    private void OnLightModeMenuClick(object sender, RoutedEventArgs e)
-    {
-        ApplyTheme(ClockTheme.Light);
-    }
-
-    private void OnCalendarMenuClick(object sender, RoutedEventArgs e)
-    {
-        if (sender is not MenuItem calendarMenu)
-        {
-            return;
-        }
-
-        if (_calendarLoading)
-        {
-            RenderCalendarLoading(calendarMenu);
-        }
-        else if (!_calendarLoaded)
-        {
-            calendarMenu.Items.Clear();
-            calendarMenu.Items.Add(new MenuItem
-            {
-                Header = "予定を初期化中です",
-                IsEnabled = false,
-            });
-        }
-        else if (!string.IsNullOrWhiteSpace(_calendarLoadError))
-        {
-            RenderCalendarError(calendarMenu, _calendarLoadError);
-        }
-        else
-        {
-            RenderCalendarEvents(calendarMenu, _calendarEvents);
-        }
-
-        calendarMenu.IsSubmenuOpen = true;
-        e.Handled = true;
     }
 
     private void OnScheduleRangeClick(object sender, MouseButtonEventArgs e)

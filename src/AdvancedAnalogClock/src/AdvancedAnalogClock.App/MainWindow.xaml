@@ -14,7 +14,6 @@
         WindowStyle="None"
         ResizeMode="CanResizeWithGrip"
         AllowsTransparency="True"
-        Loaded="OnWindowLoaded"
         Background="Transparent">
     <Window.Resources>
         <SolidColorBrush x:Key="ClockFaceFillBrush" Color="#0B1220" />
@@ -28,6 +27,7 @@
         <SolidColorBrush x:Key="HourHandBrush" Color="#F1F5F9" />
         <SolidColorBrush x:Key="MinuteHandBrush" Color="#BFDBFE" />
         <SolidColorBrush x:Key="SecondHandBrush" Color="#FB7185" />
+        <SolidColorBrush x:Key="CurrentTimeMarkerBrush" Color="#DC2626" />
         <SolidColorBrush x:Key="CenterDotFillBrush" Color="#E2E8F0" />
         <SolidColorBrush x:Key="CenterDotStrokeBrush" Color="#0F172A" />
     </Window.Resources>
@@ -47,11 +47,12 @@
                               IsCheckable="True"
                               Click="OnDarkModeMenuClick" />
                 </MenuItem>
+                <MenuItem Header="予定を取得" Click="OnRefreshCalendarMenuClick" />
                 <MenuItem x:Name="CalendarMenuItem"
-                          Header="予定"
+                          Header="予定一覧"
                           StaysOpenOnClick="True"
                           Click="OnCalendarMenuClick">
-                    <MenuItem Header="クリックして読み込み" IsEnabled="False" />
+                    <MenuItem Header="予定を取得してください" IsEnabled="False" />
                 </MenuItem>
                 <Separator />
                 <MenuItem Header="終了" Click="OnExitMenuClick" />
@@ -59,72 +60,111 @@
         </Grid.ContextMenu>
 
         <Viewbox Stretch="Uniform">
-            <Grid Width="300" Height="300">
-                <Grid.Clip>
-                    <EllipseGeometry Center="150,150" RadiusX="148" RadiusY="148" />
-                </Grid.Clip>
+            <Grid Width="360" Height="360">
+                <Ellipse Width="294"
+                         Height="294"
+                         HorizontalAlignment="Center"
+                         VerticalAlignment="Center"
+                         Margin="0,24,0,0"
+                         Fill="#5A000000">
+                    <Ellipse.Effect>
+                        <BlurEffect Radius="34" />
+                    </Ellipse.Effect>
+                </Ellipse>
 
-                <Ellipse Fill="{DynamicResource ClockFaceFillBrush}"
-                         Stroke="{DynamicResource ClockOuterStrokeBrush}"
-                         StrokeThickness="4" />
+                <Ellipse Width="286"
+                         Height="286"
+                         HorizontalAlignment="Center"
+                         VerticalAlignment="Center"
+                         Margin="0,14,0,0"
+                         Fill="#3A000000">
+                    <Ellipse.Effect>
+                        <BlurEffect Radius="22" />
+                    </Ellipse.Effect>
+                </Ellipse>
 
-                <Ellipse Margin="8"
-                         Stroke="{DynamicResource ClockInnerStrokeBrush}"
-                         StrokeThickness="2" />
+                <Grid Width="300"
+                      Height="300"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Center">
+                    <Grid.Clip>
+                        <EllipseGeometry Center="150,150" RadiusX="148" RadiusY="148" />
+                    </Grid.Clip>
 
-                <ItemsControl ItemsSource="{Binding ScheduleRanges}">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <Canvas Width="300" Height="300" />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Path Data="{Binding Geometry}"
-                                  Fill="{Binding Fill}"
-                                  Stroke="{Binding Stroke}"
-                                  StrokeThickness="0.8"
-                                  ToolTip="{Binding ToolTip}"
-                                  Cursor="Hand"
-                                  MouseLeftButtonUp="OnScheduleRangeClick" />
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+                    <Ellipse Fill="{DynamicResource ClockFaceFillBrush}"
+                             Stroke="{DynamicResource ClockOuterStrokeBrush}"
+                             StrokeThickness="4" />
 
-                <ItemsControl ItemsSource="{Binding TickMarks}">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <Canvas Width="300" Height="300" />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Line X1="{Binding X1}"
-                                  Y1="{Binding Y1}"
-                                  X2="{Binding X2}"
-                                  Y2="{Binding Y2}"
-                                  Stroke="{DynamicResource TickBrush}"
-                                  StrokeThickness="1"
-                                  StrokeStartLineCap="Round"
-                                  StrokeEndLineCap="Round">
-                                <Line.Style>
-                                    <Style TargetType="Line">
-                                        <Setter Property="Stroke" Value="{DynamicResource TickBrush}" />
-                                        <Setter Property="StrokeThickness" Value="1" />
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding IsHourMark}" Value="True">
-                                                <Setter Property="Stroke" Value="{DynamicResource HourTickBrush}" />
-                                                <Setter Property="StrokeThickness" Value="2.6" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Line.Style>
-                            </Line>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+                    <Ellipse Margin="8"
+                             Stroke="{DynamicResource ClockInnerStrokeBrush}"
+                             StrokeThickness="2" />
 
-                <ItemsControl ItemsSource="{Binding NumberMarks}">
+                    <ItemsControl ItemsSource="{Binding ScheduleRanges}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <Canvas Width="300" Height="300" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Path Data="{Binding Geometry}"
+                                      Fill="{Binding Fill}"
+                                      Stroke="{Binding Stroke}"
+                                      StrokeThickness="0.8"
+                                      ToolTip="{Binding ToolTip}"
+                                      Cursor="Hand"
+                                      MouseLeftButtonUp="OnScheduleRangeClick" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <ItemsControl ItemsSource="{Binding TickMarks}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <Canvas Width="300" Height="300" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Line X1="{Binding X1}"
+                                      Y1="{Binding Y1}"
+                                      X2="{Binding X2}"
+                                      Y2="{Binding Y2}"
+                                      Stroke="{DynamicResource TickBrush}"
+                                      StrokeThickness="1"
+                                      StrokeStartLineCap="Round"
+                                      StrokeEndLineCap="Round">
+                                    <Line.Style>
+                                        <Style TargetType="Line">
+                                            <Setter Property="Stroke" Value="{DynamicResource TickBrush}" />
+                                            <Setter Property="StrokeThickness" Value="1" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsHourMark}" Value="True">
+                                                    <Setter Property="Stroke" Value="{DynamicResource HourTickBrush}" />
+                                                    <Setter Property="StrokeThickness" Value="2.6" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Line.Style>
+                                </Line>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <Line X1="150"
+                          Y1="4"
+                          X2="150"
+                          Y2="28"
+                          Stroke="{DynamicResource CurrentTimeMarkerBrush}"
+                          StrokeThickness="3"
+                          StrokeStartLineCap="Round"
+                          StrokeEndLineCap="Round">
+                        <Line.RenderTransform>
+                            <RotateTransform Angle="{Binding HourAngle}" CenterX="150" CenterY="150" />
+                        </Line.RenderTransform>
+                    </Line>
+
+                    <ItemsControl ItemsSource="{Binding NumberMarks}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <Canvas Width="300" Height="300" />
@@ -148,9 +188,9 @@
                                        Margin="-12,-12,0,0" />
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
-                </ItemsControl>
+                    </ItemsControl>
 
-                <Line X1="150"
+                    <Line X1="150"
                       Y1="150"
                       X2="150"
                       Y2="92"
@@ -161,9 +201,9 @@
                     <Line.RenderTransform>
                         <RotateTransform Angle="{Binding HourAngle}" CenterX="150" CenterY="150" />
                     </Line.RenderTransform>
-                </Line>
+                    </Line>
 
-                <Line X1="150"
+                    <Line X1="150"
                       Y1="150"
                       X2="150"
                       Y2="66"
@@ -174,9 +214,9 @@
                     <Line.RenderTransform>
                         <RotateTransform Angle="{Binding MinuteAngle}" CenterX="150" CenterY="150" />
                     </Line.RenderTransform>
-                </Line>
+                    </Line>
 
-                <Line X1="150"
+                    <Line X1="150"
                       Y1="160"
                       X2="150"
                       Y2="48"
@@ -187,9 +227,9 @@
                     <Line.RenderTransform>
                         <RotateTransform Angle="{Binding SecondAngle}" CenterX="150" CenterY="150" />
                     </Line.RenderTransform>
-                </Line>
+                    </Line>
 
-                <ItemsControl ItemsSource="{Binding ScheduleRanges}">
+                    <ItemsControl ItemsSource="{Binding ScheduleRanges}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <Canvas Width="300" Height="300" />
@@ -205,15 +245,16 @@
                                   MouseLeftButtonDown="OnScheduleRangeClick" />
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
-                </ItemsControl>
+                    </ItemsControl>
 
-                <Ellipse Width="12"
-                         Height="12"
-                         HorizontalAlignment="Center"
-                         VerticalAlignment="Center"
-                         Fill="{DynamicResource CenterDotFillBrush}"
-                         Stroke="{DynamicResource CenterDotStrokeBrush}"
-                         StrokeThickness="1.5" />
+                    <Ellipse Width="12"
+                             Height="12"
+                             HorizontalAlignment="Center"
+                             VerticalAlignment="Center"
+                             Fill="{DynamicResource CenterDotFillBrush}"
+                             Stroke="{DynamicResource CenterDotStrokeBrush}"
+                             StrokeThickness="1.5" />
+                </Grid>
             </Grid>
         </Viewbox>
     </Grid>

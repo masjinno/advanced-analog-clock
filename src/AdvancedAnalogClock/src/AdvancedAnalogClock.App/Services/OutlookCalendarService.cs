@@ -131,19 +131,7 @@ public sealed class OutlookCalendarService : IOutlookCalendarService
 
     private static string? BuildBodyPreview(string? body)
     {
-        var normalized = Normalize(body);
-        if (normalized is null)
-        {
-            return null;
-        }
-
-        const int maxLength = 500;
-        if (normalized.Length <= maxLength)
-        {
-            return normalized;
-        }
-
-        return normalized[..maxLength] + "...";
+        return Normalize(body);
     }
 
     private static string? TryFindFirstUrl(string? body)
