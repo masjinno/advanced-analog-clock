@@ -1,6 +1,6 @@
-using AdvancedAnalogClock.App.Models;
+using AdvancedAnalogClock.Domain.Models;
 
-namespace AdvancedAnalogClock.App.Services;
+namespace AdvancedAnalogClock.Domain.Services;
 
 public interface IOutlookCalendarService
 {

@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AdvancedAnalogClock.Domain\AdvancedAnalogClock.Domain.csproj" />
+    <ProjectReference Include="..\AdvancedAnalogClock.Infrastructure\AdvancedAnalogClock.Infrastructure.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

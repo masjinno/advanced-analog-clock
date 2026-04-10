@@ -7,10 +7,11 @@ using System.Windows.Input;
 using System.Windows.Controls;
 using System.Windows.Interop;
 using System.Windows.Media;
-using AdvancedAnalogClock.App.Models;
-using AdvancedAnalogClock.App.Services;
 using AdvancedAnalogClock.App.ViewModels;
 using AdvancedAnalogClock.App.Views;
+using AdvancedAnalogClock.Domain.Models;
+using AdvancedAnalogClock.Domain.Services;
+using AdvancedAnalogClock.Infrastructure.Services;
 
 namespace AdvancedAnalogClock.App;
 

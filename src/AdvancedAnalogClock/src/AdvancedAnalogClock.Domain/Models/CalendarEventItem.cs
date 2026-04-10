@@ -1,4 +1,4 @@
-namespace AdvancedAnalogClock.App.Models;
+namespace AdvancedAnalogClock.Domain.Models;
 
 public sealed class CalendarEventItem
 {

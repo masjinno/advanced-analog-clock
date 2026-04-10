@@ -1,6 +1,6 @@
 using System.Diagnostics;
 using System.Windows;
-using AdvancedAnalogClock.App.Models;
+using AdvancedAnalogClock.Domain.Models;
 
 namespace AdvancedAnalogClock.App.Views;
 

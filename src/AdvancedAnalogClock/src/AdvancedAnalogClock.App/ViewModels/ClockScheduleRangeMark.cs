@@ -1,5 +1,5 @@
 using System.Windows.Media;
-using AdvancedAnalogClock.App.Models;
+using AdvancedAnalogClock.Domain.Models;
 
 namespace AdvancedAnalogClock.App.ViewModels;
 

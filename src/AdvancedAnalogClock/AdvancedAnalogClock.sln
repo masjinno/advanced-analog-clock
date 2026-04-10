@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdvancedAnalogClock.Domain.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdvancedAnalogClock.App", "src\AdvancedAnalogClock.App\AdvancedAnalogClock.App.csproj", "{C7EFCDB9-D378-435E-8BDE-1A2A80011D96}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdvancedAnalogClock.Infrastructure", "src\AdvancedAnalogClock.Infrastructure\AdvancedAnalogClock.Infrastructure.csproj", "{AE68E079-55C2-4CAE-AF34-917B42BB441B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -59,6 +61,18 @@ Global
 		{C7EFCDB9-D378-435E-8BDE-1A2A80011D96}.Release|x64.Build.0 = Release|Any CPU
 		{C7EFCDB9-D378-435E-8BDE-1A2A80011D96}.Release|x86.ActiveCfg = Release|Any CPU
 		{C7EFCDB9-D378-435E-8BDE-1A2A80011D96}.Release|x86.Build.0 = Release|Any CPU
+		{AE68E079-55C2-4CAE-AF34-917B42BB441B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE68E079-55C2-4CAE-AF34-917B42BB441B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE68E079-55C2-4CAE-AF34-917B42BB441B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{AE68E079-55C2-4CAE-AF34-917B42BB441B}.Debug|x64.Build.0 = Debug|Any CPU
+		{AE68E079-55C2-4CAE-AF34-917B42BB441B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{AE68E079-55C2-4CAE-AF34-917B42BB441B}.Debug|x86.Build.0 = Debug|Any CPU
+		{AE68E079-55C2-4CAE-AF34-917B42BB441B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE68E079-55C2-4CAE-AF34-917B42BB441B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AE68E079-55C2-4CAE-AF34-917B42BB441B}.Release|x64.ActiveCfg = Release|Any CPU
+		{AE68E079-55C2-4CAE-AF34-917B42BB441B}.Release|x64.Build.0 = Release|Any CPU
+		{AE68E079-55C2-4CAE-AF34-917B42BB441B}.Release|x86.ActiveCfg = Release|Any CPU
+		{AE68E079-55C2-4CAE-AF34-917B42BB441B}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -67,5 +81,6 @@ Global
 		{E0089E1E-D73D-45E5-923F-876D2810C089} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{6CB09ECF-C8BF-46C3-903B-A7DEF463BAAA} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 		{C7EFCDB9-D378-435E-8BDE-1A2A80011D96} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{AE68E079-55C2-4CAE-AF34-917B42BB441B} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 	EndGlobalSection
 EndGlobal

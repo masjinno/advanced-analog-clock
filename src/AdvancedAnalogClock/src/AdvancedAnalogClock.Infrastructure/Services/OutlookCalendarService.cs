@@ -1,9 +1,10 @@
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
-using AdvancedAnalogClock.App.Models;
+using AdvancedAnalogClock.Domain.Models;
+using AdvancedAnalogClock.Domain.Services;
 
-namespace AdvancedAnalogClock.App.Services;
+namespace AdvancedAnalogClock.Infrastructure.Services;
 
 public sealed class OutlookCalendarService : IOutlookCalendarService
 {

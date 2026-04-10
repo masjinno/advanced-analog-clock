@@ -2,8 +2,8 @@ using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Threading;
-using AdvancedAnalogClock.App.Models;
 using AdvancedAnalogClock.Domain;
+using AdvancedAnalogClock.Domain.Models;
 
 namespace AdvancedAnalogClock.App.ViewModels;
 
