@@ -44,6 +44,8 @@ public partial class ScheduleDetailWindow : Window
                 FileName = _joinUrl,
                 UseShellExecute = true,
             });
+
+            Close();
         }
         catch (Exception ex)
         {

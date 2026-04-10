@@ -11,6 +11,14 @@ public sealed class OutlookCalendarService : IOutlookCalendarService
         "https?://[^\\s<>\"']+",
         RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
+    private static readonly string[] MeetingDomains =
+    [
+        "teams.microsoft.com",
+        "zoom.us",
+        "meet.google.com",
+        "webex.com",
+    ];
+
     public async Task<IReadOnlyList<CalendarEventItem>> GetTodayEventsAsync(CancellationToken cancellationToken)
     {
         await Task.Yield();
@@ -141,13 +149,39 @@ public sealed class OutlookCalendarService : IOutlookCalendarService
             return null;
         }
 
-        var match = UrlRegex.Match(body);
-        if (!match.Success)
+        var matches = UrlRegex.Matches(body);
+        if (matches.Count == 0)
         {
             return null;
         }
 
-        return match.Value;
+        var urls = matches
+            .Select(x => x.Value)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        foreach (var domain in MeetingDomains)
+        {
+            var preferred = urls.FirstOrDefault(url => IsDomainMatch(url, domain));
+            if (!string.IsNullOrWhiteSpace(preferred))
+            {
+                return preferred;
+            }
+        }
+
+        return null;
+    }
+
+    private static bool IsDomainMatch(string url, string expectedDomain)
+    {
+        if (!Uri.TryCreate(url, UriKind.Absolute, out var uri))
+        {
+            return false;
+        }
+
+        var host = uri.Host;
+        return host.Equals(expectedDomain, StringComparison.OrdinalIgnoreCase)
+               || host.EndsWith($".{expectedDomain}", StringComparison.OrdinalIgnoreCase);
     }
 
     private static T? SafeRead<T>(Func<T?> getter)
