@@ -13,12 +13,15 @@ public sealed class MainWindowViewModel : ObservableObject, IDisposable
     private readonly DispatcherTimer _timer;
     private static readonly Color[] ScheduleColors =
     [
-        (Color)ColorConverter.ConvertFromString("#66FB7185"),
+        (Color)ColorConverter.ConvertFromString("#66EF4444"),
         (Color)ColorConverter.ConvertFromString("#66F59E0B"),
-        (Color)ColorConverter.ConvertFromString("#6660A5FA"),
-        (Color)ColorConverter.ConvertFromString("#6634D399"),
-        (Color)ColorConverter.ConvertFromString("#66F472B6"),
+        (Color)ColorConverter.ConvertFromString("#6622C55E"),
+        (Color)ColorConverter.ConvertFromString("#663B82F6"),
+        (Color)ColorConverter.ConvertFromString("#66A855F7"),
     ];
+
+    // Use a contrast-first sequence so neighboring schedules avoid similar hues.
+    private static readonly int[] ScheduleColorOrder = [0, 2, 4, 1, 3];
 
     private double _hourAngle;
     private double _minuteAngle;
@@ -89,6 +92,8 @@ public sealed class MainWindowViewModel : ObservableObject, IDisposable
                 return new RenderScheduleItem(x, start, end);
             })
             .Where(x => x.End > x.Start)
+            .OrderBy(x => x.Start)
+            .ThenBy(x => x.End)
             .ToList();
 
         var laneAssignments = AssignLanes(timedEvents);
@@ -103,7 +108,7 @@ public sealed class MainWindowViewModel : ObservableObject, IDisposable
 
             foreach (var segment in BuildSegments(renderItem.Start, renderItem.End, lane))
             {
-                var color = ScheduleColors[i % ScheduleColors.Length];
+                var color = ScheduleColors[ScheduleColorOrder[i % ScheduleColorOrder.Length]];
                 var fillBrush = new SolidColorBrush(color);
                 var strokeBrush = new SolidColorBrush(Color.Multiply(color, 1.15f));
                 fillBrush.Freeze();
