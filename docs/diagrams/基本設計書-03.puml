@@ -1,0 +1,26 @@
+﻿@startuml
+title Context Menu Flow
+
+start
+:Right click;
+if (Fetch Schedule?) then (yes)
+  :Read today's events from Outlook;
+  if (Fetch succeeded?) then (yes)
+    :Update schedule list;
+    :Update schedule bands;
+  else (no)
+    :Show error message;
+    :Clear schedule bands;
+  endif
+endif
+
+if (Open Schedule List?) then (yes)
+  :Show timed events and all-day events;
+endif
+
+if (Click schedule band?) then (yes)
+  :Open schedule detail window;
+endif
+
+stop
+@enduml

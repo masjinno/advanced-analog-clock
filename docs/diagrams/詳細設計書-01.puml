@@ -1,0 +1,20 @@
+﻿@startuml
+title Schedule Fetch Sequence
+
+actor User
+participant MainWindow
+participant OutlookCalendarService
+participant "Outlook Desktop(COM)" as Outlook
+participant MainWindowViewModel
+
+User -> MainWindow : Click "Fetch Schedule"
+MainWindow -> OutlookCalendarService : GetTodayEventsAsync()
+OutlookCalendarService -> Outlook : Acquire Outlook.Application
+OutlookCalendarService -> Outlook : Get default calendar
+OutlookCalendarService -> Outlook : Restrict by today range
+Outlook --> OutlookCalendarService : Event list
+OutlookCalendarService --> MainWindow : CalendarEventItem[]
+MainWindow -> MainWindowViewModel : UpdateScheduleRanges(timedEvents)
+MainWindow -> MainWindow : RenderCalendarEvents(allEvents)
+MainWindow --> User : Refresh list and clock bands
+@enduml

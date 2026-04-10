@@ -1,0 +1,13 @@
+﻿@startuml
+title Schedule Band Click to Detail View
+
+actor User
+participant MainWindow
+participant ScheduleDetailWindow
+
+User -> MainWindow : Click schedule band
+MainWindow -> MainWindow : OnScheduleRangeClick
+MainWindow -> ScheduleDetailWindow : new(event)
+MainWindow -> ScheduleDetailWindow : Show()
+ScheduleDetailWindow --> User : Show detail window
+@enduml

@@ -1,0 +1,19 @@
+﻿@startuml
+title Join Link Launch Sequence
+
+actor User
+participant ScheduleDetailWindow
+participant OS
+
+User -> ScheduleDetailWindow : Click "Open Join Link"
+alt JoinUrl exists
+  ScheduleDetailWindow -> OS : Process.Start(url)
+  alt launch succeeded
+    ScheduleDetailWindow -> ScheduleDetailWindow : Close()
+  else launch failed
+    ScheduleDetailWindow -> User : Show error dialog
+  end
+else JoinUrl missing
+  ScheduleDetailWindow --> User : Button disabled
+end
+@enduml

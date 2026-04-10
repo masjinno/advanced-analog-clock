@@ -1,0 +1,16 @@
+﻿@startuml
+title Screen Overview
+
+rectangle "MainWindow\n(Analog Clock)" as main {
+  rectangle "Clock Area\n- hands/ticks/numbers\n- schedule bands\n- current time marker" as clock
+  rectangle "Context Menu\n- Fetch Schedule\n- Schedule List\n- Theme\n- Exit" as menu
+}
+
+rectangle "ScheduleDetailWindow\n(Event Detail)" as detail {
+  rectangle "Subject / Time / Location / Body" as fields
+  rectangle "Open Join Link / Close" as buttons
+}
+
+main --> detail : click schedule band
+menu --> clock : refresh after fetch
+@enduml

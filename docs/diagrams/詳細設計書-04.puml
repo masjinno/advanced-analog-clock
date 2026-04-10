@@ -1,0 +1,44 @@
+﻿@startuml
+title Core Class Relationship Diagram
+
+class MainWindow {
+  +OnRefreshCalendarMenuClick()
+  +OnCalendarMenuClick()
+  +OnScheduleRangeClick()
+  -FetchCalendarAsync()
+}
+
+class MainWindowViewModel {
+  +UpdateScheduleRanges(events)
+  -AssignLanes(items)
+  -BuildSegments(start,end,lane)
+}
+
+class OutlookCalendarService {
+  +GetTodayEventsAsync(token)
+  -ReadTodayEventsFromDesktopOutlook(token)
+  -TryFindFirstUrl(body)
+}
+
+class ScheduleDetailWindow {
+  +OnOpenJoinLinkClick()
+  +OnCloseClick()
+}
+
+class CalendarEventItem {
+  +Subject
+  +StartLocal
+  +EndLocal
+  +IsAllDay
+  +Location
+  +BodyPreview
+  +JoinUrl
+}
+
+MainWindow --> MainWindowViewModel
+MainWindow --> OutlookCalendarService
+MainWindow --> ScheduleDetailWindow
+MainWindowViewModel --> CalendarEventItem
+OutlookCalendarService --> CalendarEventItem
+ScheduleDetailWindow --> CalendarEventItem
+@enduml

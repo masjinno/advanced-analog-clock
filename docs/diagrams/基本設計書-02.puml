@@ -1,0 +1,22 @@
+﻿@startuml
+title System Component Diagram
+
+package "AdvancedAnalogClock.App" {
+  [MainWindow]
+  [ScheduleDetailWindow]
+  [MainWindowViewModel]
+  [OutlookCalendarService]
+}
+
+package "AdvancedAnalogClock.Domain" {
+  [ClockMath]
+}
+
+cloud "Outlook Desktop\n(COM)" as outlook
+
+[MainWindow] --> [MainWindowViewModel]
+[MainWindow] --> [OutlookCalendarService]
+[MainWindowViewModel] --> [ClockMath]
+[OutlookCalendarService] --> outlook
+[MainWindow] --> [ScheduleDetailWindow]
+@enduml
