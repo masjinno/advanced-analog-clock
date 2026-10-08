@@ -20,6 +20,8 @@ namespace AdvancedAnalogClock.App;
 /// </summary>
 public partial class MainWindow : Window
 {
+    private const double StartupRightMargin = 10;
+    private const double StartupBottomMargin = 10;
     private const int WmSizing = 0x0214;
     private const int WmszLeft = 1;
     private const int WmszRight = 2;
@@ -54,6 +56,22 @@ public partial class MainWindow : Window
         _outlookCalendarService = new OutlookCalendarService();
         DataContext = _viewModel;
         ApplyTheme(ClockTheme.Light);
+        Loaded += OnMainWindowLoaded;
+    }
+
+    private void OnMainWindowLoaded(object sender, RoutedEventArgs e)
+    {
+        PositionWindowBottomRightOnPrimaryWorkArea();
+    }
+
+    private void PositionWindowBottomRightOnPrimaryWorkArea()
+    {
+        var workArea = SystemParameters.WorkArea;
+        var windowWidth = ActualWidth > 0 ? ActualWidth : Width;
+        var windowHeight = ActualHeight > 0 ? ActualHeight : Height;
+
+        Left = Math.Max(workArea.Left, workArea.Right - windowWidth - StartupRightMargin);
+        Top = Math.Max(workArea.Top, workArea.Bottom - windowHeight - StartupBottomMargin);
     }
 
     protected override void OnSourceInitialized(EventArgs e)
