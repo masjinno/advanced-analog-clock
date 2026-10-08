@@ -32,8 +32,8 @@
         <SolidColorBrush x:Key="CenterDotStrokeBrush" Color="#0F172A" />
     </Window.Resources>
 
-        <Grid Margin="10"
-            MouseLeftButtonDown="OnWindowDragMove">
+          <Grid MouseLeftButtonDown="OnWindowDragMove"
+              Background="#01000000">
         <Grid.ContextMenu>
             <ContextMenu x:Name="ClockContextMenu">
 
@@ -59,7 +59,7 @@
             </ContextMenu>
         </Grid.ContextMenu>
 
-        <Viewbox Stretch="Uniform">
+        <Viewbox Margin="10" Stretch="Uniform">
             <Grid Width="360" Height="360">
                 <Ellipse Width="294"
                          Height="294"
@@ -257,5 +257,6 @@
                 </Grid>
             </Grid>
         </Viewbox>
+
     </Grid>
 </Window>

@@ -22,6 +22,9 @@ public partial class MainWindow : Window
 {
     private const double StartupRightMargin = 10;
     private const double StartupBottomMargin = 10;
+    private const double BottomRightResizeTriangleSize = 28;
+    private const int WmNcHitTest = 0x0084;
+    private const int HtBottomRight = 17;
     private const int WmSizing = 0x0214;
     private const int WmszLeft = 1;
     private const int WmszRight = 2;
@@ -111,6 +114,27 @@ public partial class MainWindow : Window
 
     private IntPtr WindowProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
     {
+        if (msg == WmNcHitTest)
+        {
+            var lParamValue = lParam.ToInt64();
+            var screenX = (short)(lParamValue & 0xFFFF);
+            var screenY = (short)((lParamValue >> 16) & 0xFFFF);
+            var clientPoint = PointFromScreen(new Point(screenX, screenY));
+            var distanceFromRight = ActualWidth - clientPoint.X;
+            var distanceFromBottom = ActualHeight - clientPoint.Y;
+
+            // Restrict resize hit-testing to a bottom-right triangle, not a broad square.
+            if (distanceFromRight >= 0 &&
+                distanceFromBottom >= 0 &&
+                distanceFromRight <= BottomRightResizeTriangleSize &&
+                distanceFromBottom <= BottomRightResizeTriangleSize &&
+                distanceFromRight + distanceFromBottom <= BottomRightResizeTriangleSize)
+            {
+                handled = true;
+                return (IntPtr)HtBottomRight;
+            }
+        }
+
         if (msg != WmSizing)
         {
             return IntPtr.Zero;
